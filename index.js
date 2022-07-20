@@ -3,7 +3,8 @@ const http = require("http");
 const url = require("url");
 ////////////////////////
 //         Server
-const data = require("./dev-data/data.json");
+
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8");
 const server = http.createServer((req, res) => {
 	const path = req.url;
 	if (path === "/" || path === "/overview") {
@@ -11,15 +12,10 @@ const server = http.createServer((req, res) => {
 	} else if (path === "/products") {
 		res.end("Hello from the products page !!");
 	} else if (req.url === "/api") {
-		const data = fs.readFile(
-			`${__dirname}/dev-data/data.json`,
-			(err, data) => {
-				res.writeHead(200, {
-					"Content-Type": "application/json",
-				});
-				res.end(data);
-			}
-		);
+		res.writeHead(200, {
+			"Content-Type": "application/json",
+		});
+		res.end(data);
 	} else {
 		res.writeHead(404, {
 			"Content-Type": "text/html",
