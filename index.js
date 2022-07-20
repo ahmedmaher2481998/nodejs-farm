@@ -7,6 +7,7 @@ const url = require("url");
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8");
 const server = http.createServer((req, res) => {
 	const path = req.url;
+	console.log("request to " + path);
 	if (path === "/" || path === "/overview") {
 		res.end("Hello from the overview");
 	} else if (path === "/products") {
