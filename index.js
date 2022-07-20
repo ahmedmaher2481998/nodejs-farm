@@ -2,42 +2,24 @@ const fs = require("fs");
 const http = require("http");
 const url = require("url");
 ////////////////////////
-//          Files
-/*
-const data = fs.readFileSync("./txt/input.txt", "utf-8");
-console.log(data);
-const textOut = `This is what we know now about Avocado: ${data}./n created on :${Date.now().toLocaleString()} `;
-let res = fs.writeFileSync("./txt/output.txt", textOut);
-console.log(res);
-console.log("file is written");
-*/
-//***async way to do the same thing - non blocking
-/*
-fs.readFile("./txt/start.txt", "utf-8", (err, data1) => {
-	fs.readFile(`./txt/${data1}.txt`, "utf-8", (err, data2) => {
-		console.log(data2);
-		fs.readFile("./txt/append.txt", "utf-8", (err, data3) => {
-			console.log(data3);
-			fs.writeFile(
-				"./txt/finalVersion.txt",
-				`${data2}\n${data3}`,
-				(err) => {
-					console.log("File is now Written");
-				}
-			);
-		});
-	});
-});
-console.log("Reading data...");
-*/
-////////////////////////
 //         Server
+const data = require("./dev-data/data.json");
 const server = http.createServer((req, res) => {
 	const path = req.url;
-	if (path === "/" || path === "/products") {
-		res.end("Hello from the Products");
-	} else if (path === "/overview") {
-		res.end("Hello from the over view page !!");
+	if (path === "/" || path === "/overview") {
+		res.end("Hello from the overview");
+	} else if (path === "/products") {
+		res.end("Hello from the products page !!");
+	} else if (req.url === "/api") {
+		const data = fs.readFile(
+			`${__dirname}/dev-data/data.json`,
+			(err, data) => {
+				res.writeHead(200, {
+					"Content-Type": "application/json",
+				});
+				res.end(data);
+			}
+		);
 	} else {
 		res.writeHead(404, {
 			"Content-Type": "text/html",
