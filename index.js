@@ -4,19 +4,29 @@ const url = require("url");
 ////////////////////////
 //         Server
 // templates used
-const card = require(`${__dirname}/templates/Card.html`);
-const overView = require(`${__dirname}/templates/overview.html`);
-const product = require(`${__dirname}/templates/product.html`);
+const card = fs.readFileSync(`${__dirname}/templates/Card.html`, "utf-8");
+const overView = fs.readFileSync(
+	`${__dirname}/templates/overview.html`,
+	"utf-8"
+);
+const product = fs.readFileSync(`${__dirname}/templates/product.html`, "utf-8");
 //data used
-const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8");
-const generateCard = (card , product)=>{ 
-	let output = card.replace(/{%IMAGE%}/g,product.image)
-	output = output.replace(/{%PRODUCT_NAME%}/g,product.productName)
-	output = output.replace(/{%QUN%}/g,product.quantity)
-	output = output.replace(/{%%}/g,product.)
-	output = output.replace(/{%%}/g,product.)
-	output = output.replace(/{%%}/g,product.)
-	return output
+const data = JSON.parse(
+	fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8")
+);
+//generating template from html and product
+const generateTemplate = (card, product) => {
+	let output = card.replace(/{%IMAGE%}/g, product.image);
+	output = output.replace(/{%PRODUCT_NAME%}/g, product.productName);
+	output = output.replace(/{%QUN%}/g, product.quantity);
+	output = output.replace(/{%FROM%}/g, product.from);
+	output = output.replace(/{%PRICE%}/g, product.price);
+	if (product.organic)
+		output = output.replace(/{%{%NOT_ORGANIC%}%}/g, "not-organic");
+	output = output.replace(/{%NEUTRINOS%}/g, product.nutrients);
+	output = output.replace(/{%DESCRIPTION%}/g, product.description);
+	output = output.replace(/{%ID%}/g, product.id);
+	return output;
 };
 const server = http.createServer((req, res) => {
 	const path = req.url;
@@ -25,8 +35,11 @@ const server = http.createServer((req, res) => {
 		res.writeHead(200, {
 			"Content-Type": "text/html",
 		});
-		const cards = data.localeCompare(product=> generateCard(card , product));
-		res.end(overView);
+
+		const cards = data.map((product) => generateTemplate(card, product));
+		console.log(cards);
+		const newOverview = overView.replace(/{%CARDS%}/g, cards.join());
+		res.end(newOverview);
 	}
 	// Product Page
 	else if (path === "/products") {
