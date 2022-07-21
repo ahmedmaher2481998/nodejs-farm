@@ -4,13 +4,22 @@ const url = require("url");
 ////////////////////////
 //         Server
 // templates used
-
-const product = fs.readFileSync(`${__dirname}/templates/product.html`, "utf-8");
+const cardTemp = fs.readFileSync(`${__dirname}/templates/Card.html`, "utf-8");
+const overViewTemp = fs.readFileSync(
+	`${__dirname}/templates/overview.html`,
+	"utf-8"
+);
+const productTemp = fs.readFileSync(
+	`${__dirname}/templates/product.html`,
+	"utf-8"
+);
 //data used
+const data = JSON.parse(
+	fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8")
+);
 //generating template from html and product
-const generateTemplate = (card, product) => {
-	console.log(card);
-	let output = card.replace(/{%IMAGE%}/g, product.image);
+const generateTemplate = (temp, product) => {
+	let output = temp.replace(/{%IMAGE%}/g, product.image);
 	output = output.replace(/{%PRODUCT_NAME%}/g, product.productName);
 
 	output = output.replace(/{%QUN%}/g, product.quantity);
@@ -25,27 +34,27 @@ const generateTemplate = (card, product) => {
 };
 const server = http.createServer((req, res) => {
 	const path = req.url;
+	const parsedUrl = url.parse(req.url, true);
+	console.log(parsedUrl);
+	//product by id
+	if (parsedUrl.query.id && parsedUrl.pathname === "/product") {
+		const id = +parsedUrl.query.id;
+		const product = data.filter((el) => el.id === id)[0];
+
+		res.end(generateTemplate(productTemp, product));
+	}
 	//Home / overView page
-	if (path === "/" || path === "/overview") {
+	else if (path === "/" || path === "/overview") {
 		console.log("generating data...");
-		const card = fs.readFileSync(
-			`${__dirname}/templates/Card.html`,
-			"utf-8"
-		);
-		const overView = fs.readFileSync(
-			`${__dirname}/templates/overview.html`,
-			"utf-8"
-		);
-		const data = JSON.parse(
-			fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8")
-		);
 
 		res.writeHead(200, {
 			"Content-Type": "text/html",
 		});
 
-		const cards = data.map((product) => generateTemplate(card, product));
-		const newOverview = overView.replace(/{%CARDS%}/g, cards.join());
+		const cards = data.map((product) =>
+			generateTemplate(cardTemp, product)
+		);
+		const newOverview = overViewTemp.replace(/{%CARDS%}/g, cards.join());
 		res.end(newOverview);
 	}
 	// Product Page
@@ -64,28 +73,10 @@ const server = http.createServer((req, res) => {
 		res.writeHead(404, {
 			"Content-Type": "text/html",
 		});
-		res.end(
-			`
-			<!DOCTYPE html>
-			<html>
-				<head>
-					<title>Not Found!</title>
-					<style> 
-					body:{padding:5px  ;background-color:green; display:flex; align-items:center;justify-content:center;}
-					h1:{ 
-						color:pink;
+		let p404 = fs.readFileSync(__dirname + "/templates/404.html", "utf-8");
+		p404 = p404.replace(/{%R%}/, path.slice(1));
 
-					}
-
-					</style>
-				</head>
-				<body>
-					<h1> 404 NotFound , we don't know where ${path.slice(1)} is? </h1>
-				</body>
-			</html>
-			
-			`
-		);
+		res.end(p404);
 	}
 });
 server.listen(8000, "127.0.0.1", () => {

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<style>
+			body {
+				width: 100vw;
+				height: 100vh;
+				animation: anime 3s ease-in-out 0.2s infinite;
+			}
+			.main {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				transition: all;
+				padding: 10px;
+			}
+			@keyframes anime {
+				0% {
+					background-color: #1b3;
+					color: black;
+					font-size: small;
+				}
+				50% {
+					background-color: #2d4;
+					color: rgb(48, 27, 27);
+					font-size: medium;
+				}
+				90% {
+					background-color: #3c4;
+					color: rgb(80, 66, 66);
+					font-size: larger;
+				}
+				100% {
+					background-color: #1b3;
+					color: rgb(39, 34, 34);
+					font-size: small;
+				}
+			}
+		</style>
+		<title>Not Found</title>
+	</head>
+	<body>
+		<div class="main">
+			<h1>404 NotFound , we don't know where {%R%} is?</h1>
+		</div>
+	</body>
+</html>
